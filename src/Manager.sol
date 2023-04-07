@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.13;
+import "forge-std/console.sol";
 
 import { 
     ISuperfluid 
@@ -54,7 +55,13 @@ contract Manager {
     collat.updateFlow(address(this), flowRate);
   }
 
-  function borrow(uint amount) public {
+  function borrow(int96 flowRate) public {
+    int96 netFlowRate = collat.getFlowRate(msg.sender, address(this));
+    console.logInt(int(netFlowRate));
+    debt.createFlow(
+      msg.sender,
+      flowRate
+    );
   }
 
   function close() public {

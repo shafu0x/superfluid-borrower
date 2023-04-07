@@ -33,21 +33,25 @@ contract ManagerTest is Test {
 
     deal(ETHx,  address(this), 1e18 ether);
     deal(USDCx, address(this), 1e18 ether);
+    deal(ETHx,  address(manager), 1e18 ether);
+    deal(USDCx, address(manager), 1e18 ether);
     collat.setMaxFlowPermissions(address(manager));
+    debt.  setMaxFlowPermissions(address(manager));
   } 
 
-  function testDepositCollat() public {
-    manager.depositCollat(1);
-  }
+  // function testDepositCollat() public {
+  //   manager.depositCollat(1);
+  // }
 
-  function testDepositDebt() public {
-    debt.approve(address(manager), 100);
-    manager.depositDebt(100);
-  }
+  // function testDepositDebt() public {
+  //   debt.approve(address(manager), 100);
+  //   manager.depositDebt(100);
+  // }
 
   function testBorrow() public {
     debt.approve(address(manager), 1e18);
     manager.depositDebt(1e18);
     manager.depositCollat(1e15);
+    manager.borrow(1);
   }
 }
