@@ -19,11 +19,6 @@ contract Manager {
 
   uint public constant MIN_COLLAT_RATIO = 1.5e18; // 150%
 
-  struct Position {
-    uint collateral;
-    uint debt;
-  }
-
   mapping (address => bool) public isBorrower;
   
   constructor(
@@ -35,6 +30,7 @@ contract Manager {
   }
 
   function deposit(int96 flowRate) public {
+    require(!isBorrower[msg.sender]);
     isBorrower[msg.sender] = true;
     collateral.createFlow(address(this), flowRate);
   }
@@ -47,6 +43,7 @@ contract Manager {
   }
 
   function close() public {
+    require(isBorrower[msg.sender]);
     isBorrower[msg.sender] = false;
     collateral.deleteFlow(msg.sender, address(this));
   }
