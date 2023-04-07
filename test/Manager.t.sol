@@ -19,7 +19,8 @@ contract ManagerTest is Test {
   using SuperTokenV1Library for ISuperToken;
 
   Manager     public manager;
-  ISuperToken public collateral;
+  ISuperToken public collat;
+  ISuperToken public debt;
 
   function setUp() public {
     manager = new Manager(
@@ -27,12 +28,26 @@ contract ManagerTest is Test {
       ISuperToken(USDCx),
       IAggregatorV3(ORACLE)
     );
-    collateral = ISuperToken(ETHx);
+    collat = ISuperToken(ETHx);
+    debt   = ISuperToken(USDCx);
+
+    deal(ETHx,  address(this), 1e18 ether);
+    deal(USDCx, address(this), 1e18 ether);
+    collat.setMaxFlowPermissions(address(manager));
   } 
 
-  function testDeposit() public {
-    deal(ETHx, address(this), 1e18 ether);
-    collateral.setMaxFlowPermissions(address(manager));
-    manager.deposit(1);
+  function testDepositCollat() public {
+    manager.depositCollat(1);
+  }
+
+  function testDepositDebt() public {
+    debt.approve(address(manager), 100);
+    manager.depositDebt(100);
+  }
+
+  function testBorrow() public {
+    debt.approve(address(manager), 1e18);
+    manager.depositDebt(1e18);
+    manager.depositCollat(1e15);
   }
 }

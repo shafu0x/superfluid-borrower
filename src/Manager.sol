@@ -17,35 +17,41 @@ contract Manager {
 
   IAggregatorV3 public oracle;
 
-  ISuperToken public collateral;
+  ISuperToken public collat;
   ISuperToken public debt;
 
   uint public constant MIN_COLLAT_RATIO = 1.5e18; // 150%
 
+  mapping (address => uint) public liquidity;
   mapping (address => bool) public isBorrower;
   
   constructor(
-    ISuperToken   _collateral,
+    ISuperToken   _collat,
     ISuperToken   _debt, 
     IAggregatorV3 _oracle 
   ) {
-    collateral = _collateral;
-    debt       = _debt;
-    oracle     = _oracle;
+    collat = _collat;
+    debt   = _debt;
+    oracle = _oracle;
   }
 
-  function deposit(int96 flowRate) public {
+  function depositCollat(int96 flowRate) public {
     require(!isBorrower[msg.sender]);
     isBorrower[msg.sender] = true;
-    collateral.createFlowFrom(
+    collat.createFlowFrom(
       msg.sender,
       address(this),
       flowRate
     );
   }
 
+  function depositDebt(uint amount) public {
+    debt.transferFrom(msg.sender, address(this), amount);
+    liquidity[msg.sender] += amount;
+  }
+
   function update(int96 flowRate) public {
-    collateral.updateFlow(address(this), flowRate);
+    collat.updateFlow(address(this), flowRate);
   }
 
   function borrow(uint amount) public {
@@ -54,7 +60,7 @@ contract Manager {
   function close() public {
     require(isBorrower[msg.sender]);
     isBorrower[msg.sender] = false;
-    collateral.deleteFlow(msg.sender, address(this));
+    collat.deleteFlow(msg.sender, address(this));
   }
 
   function liquidate(address borrower) public {
