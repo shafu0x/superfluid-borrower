@@ -21,7 +21,6 @@ contract Manager {
   using SafeCast            for int;
   using SafeCast            for uint;
 
-
   IAggregatorV3 public oracle;
 
   ISuperToken public collat;
