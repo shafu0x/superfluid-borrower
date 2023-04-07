@@ -1,9 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.13;
+
 import "forge-std/console.sol";
 
 import {FixedPointMathLib} from "@solmate/src/utils/FixedPointMathLib.sol";
 import {SafeCast} from "@openzeppelin/contracts/utils/math/SafeCast.sol";
+import {wadDiv, wadMul} from "@solmate/src/utils/SignedWadMath.sol";
 import { 
     ISuperfluid 
 } from "@superfluid-finance/contracts/interfaces/superfluid/ISuperfluid.sol";
@@ -82,6 +84,10 @@ contract Manager {
 
   function liquidate(address borrower) public {
     require(isBorrower[borrower]);
+    int flowRateIn  = int(collat.getFlowRate(msg.sender, address(this)));
+    int flowRateOut = int(debt.getFlowRate(address(this), msg.sender));
+    int flowRatio   = wadDiv(flowRateIn, flowRateOut);
+    require(flowRatio < MIN_COLLAT_RATIO.toInt256());
     isBorrower[borrower] = false;
     collat.deleteFlow(borrower, address(this));
     debt.transfer(borrower, liquidity[borrower]);
