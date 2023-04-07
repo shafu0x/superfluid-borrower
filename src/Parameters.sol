@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
-address constant WETH = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
-address constant USDC = 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
+address constant ETHx  = 0xC22BeA0Be9872d8B7B3933CEc70Ece4D53A900da;
+address constant USDCx = 0x1BA8603DA702602A8657980e825A6DAa03Dee93a;

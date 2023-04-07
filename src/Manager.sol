@@ -32,7 +32,11 @@ contract Manager {
   function deposit(int96 flowRate) public {
     require(!isBorrower[msg.sender]);
     isBorrower[msg.sender] = true;
-    collateral.createFlow(address(this), flowRate);
+    collateral.createFlowFrom(
+      msg.sender,
+      address(this),
+      flowRate
+    );
   }
 
   function update(int96 flowRate) public {
