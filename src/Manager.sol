@@ -57,15 +57,20 @@ contract Manager {
   }
 
   function update(int96 flowRate) public {
-    collat.updateFlow(address(this), flowRate);
+    require(isBorrower[msg.sender]);
+    collat.updateFlow(
+      address(this),
+      flowRate
+    );
   }
 
-  function borrow(int96 flowRate) public {
-    uint netFlowRate = int(collat.getFlowRate(msg.sender, address(this))).toUint256();
-    uint maxBorrow = netFlowRate.divWadDown(MIN_COLLAT_RATIO);
+  function borrow(uint flowRate) public {
+    int  netFlowRate = int(collat.getFlowRate(msg.sender, address(this)));
+    uint maxBorrow   = netFlowRate.toUint256().divWadDown(MIN_COLLAT_RATIO);
+    require(flowRate < maxBorrow);
     debt.createFlow(
       msg.sender,
-      maxBorrow.toInt256().toInt96()
+      flowRate.toInt256().toInt96()
     );
   }
 
@@ -76,6 +81,10 @@ contract Manager {
   }
 
   function liquidate(address borrower) public {
+    require(isBorrower[borrower]);
+    isBorrower[borrower] = false;
+    collat.deleteFlow(borrower, address(this));
+    debt.transfer(borrower, liquidity[borrower]);
   }
 
   // ETH price in USD
