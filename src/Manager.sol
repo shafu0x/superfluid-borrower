@@ -90,7 +90,7 @@ contract Manager {
     require(flowRatio < MIN_COLLAT_RATIO.toInt256());
     isBorrower[borrower] = false;
     collat.deleteFlow(borrower, address(this));
-    debt.transfer(borrower, liquidity[borrower]);
+    collat.transfer(borrower, liquidity[borrower]);
   }
 
   // ETH price in USD
