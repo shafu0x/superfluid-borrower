@@ -1,19 +1,25 @@
-// SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.13;
+// initializing the CFA Library
+pragma solidity 0.8.14;
+
+import { 
+    ISuperfluid 
+} from "@superfluid-finance/contracts/interfaces/superfluid/ISuperfluid.sol";
+
+import { 
+    ISuperToken 
+} from "@superfluid-finance/contracts/interfaces/superfluid/ISuperToken.sol";
 
 import {
-    ISuperfluid,
-    ISuperToken
-} from "@superfluid/contracts/interfaces/superfluid/ISuperfluid.sol";
+    SuperTokenV1Library
+} from "@superfluid-finance/contracts/apps/SuperTokenV1Library.sol";
 
-contract Counter {
-    uint256 public number;
+contract Manager {
 
-    function setNumber(uint256 newNumber) public {
-        number = newNumber;
+    using SuperTokenV1Library for ISuperToken;
+    ISuperToken public token;
+    
+    constructor(ISuperToken _token) {
+        token = _token;
     }
-
-    function increment() public {
-        number++;
-    }
+    //your contract code here...
 }
