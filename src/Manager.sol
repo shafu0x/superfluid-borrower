@@ -2,6 +2,8 @@
 pragma solidity 0.8.13;
 import "forge-std/console.sol";
 
+import {FixedPointMathLib} from "@solmate/src/utils/FixedPointMathLib.sol";
+import {SafeCast} from "@openzeppelin/contracts/utils/math/SafeCast.sol";
 import { 
     ISuperfluid 
 } from "@superfluid-finance/contracts/interfaces/superfluid/ISuperfluid.sol";
@@ -14,7 +16,11 @@ import {
 import {IAggregatorV3} from "./interfaces/IAggregatorV3.sol";
 
 contract Manager {
+  using FixedPointMathLib   for uint;
   using SuperTokenV1Library for ISuperToken;
+  using SafeCast            for int;
+  using SafeCast            for uint;
+
 
   IAggregatorV3 public oracle;
 
@@ -56,11 +62,11 @@ contract Manager {
   }
 
   function borrow(int96 flowRate) public {
-    int96 netFlowRate = collat.getFlowRate(msg.sender, address(this));
-    console.logInt(int(netFlowRate));
+    uint netFlowRate = int(collat.getFlowRate(msg.sender, address(this))).toUint256();
+    uint maxBorrow = netFlowRate.divWadDown(MIN_COLLAT_RATIO);
     debt.createFlow(
       msg.sender,
-      flowRate
+      maxBorrow.toInt256().toInt96()
     );
   }
 
@@ -77,7 +83,7 @@ contract Manager {
   function _getEthPrice() 
     private 
     view 
-    returns (int) {
+    returns (uint) {
       (
         uint80 roundID,
         int256 price,
@@ -87,6 +93,6 @@ contract Manager {
       ) = oracle.latestRoundData();
       require(timeStamp != 0);
       require(answeredInRound >= roundID);
-      return price;
+      return price.toUint256();
   }
 }
