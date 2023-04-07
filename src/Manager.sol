@@ -10,9 +10,12 @@ import {
 import {
     SuperTokenV1Library
 } from "@superfluid-finance/contracts/apps/SuperTokenV1Library.sol";
+import {IAggregatorV3} from "./interfaces/IAggregatorV3.sol";
 
 contract Manager {
   using SuperTokenV1Library for ISuperToken;
+
+  IAggregatorV3 public oracle;
 
   ISuperToken public collateral;
   ISuperToken public debt;
@@ -22,11 +25,13 @@ contract Manager {
   mapping (address => bool) public isBorrower;
   
   constructor(
-    ISuperToken _collateral,
-    ISuperToken _debt
+    ISuperToken   _collateral,
+    ISuperToken   _debt, 
+    IAggregatorV3 _oracle 
   ) {
     collateral = _collateral;
     debt       = _debt;
+    oracle     = _oracle;
   }
 
   function deposit(int96 flowRate) public {
@@ -53,5 +58,22 @@ contract Manager {
   }
 
   function liquidate(address borrower) public {
+  }
+
+  // ETH price in USD
+  function _getEthPrice() 
+    private 
+    view 
+    returns (int) {
+      (
+        uint80 roundID,
+        int256 price,
+        , 
+        uint256 timeStamp, 
+        uint80 answeredInRound
+      ) = oracle.latestRoundData();
+      require(timeStamp != 0);
+      require(answeredInRound >= roundID);
+      return price;
   }
 }

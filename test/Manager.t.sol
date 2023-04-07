@@ -12,7 +12,8 @@ import {
 } from "@superfluid-finance/contracts/apps/SuperTokenV1Library.sol";
 
 import {Manager} from "../src/Manager.sol";
-import {ETHx, USDCx} from "../src/Parameters.sol";
+import {IAggregatorV3} from "../src/interfaces/IAggregatorV3.sol";
+import {ETHx, USDCx, ORACLE} from "../src/Parameters.sol";
 
 contract ManagerTest is Test {
   using SuperTokenV1Library for ISuperToken;
@@ -23,7 +24,8 @@ contract ManagerTest is Test {
   function setUp() public {
     manager = new Manager(
       ISuperToken(ETHx),
-      ISuperToken(USDCx)
+      ISuperToken(USDCx),
+      IAggregatorV3(ORACLE)
     );
     collateral = ISuperToken(ETHx);
   } 
